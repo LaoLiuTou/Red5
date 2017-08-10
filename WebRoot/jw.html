@@ -1,0 +1,35 @@
+
+<head>
+    <meta charset="UTF-8">
+    
+
+<script type="text/javascript" src="jwplayer/jwplayer.js"></script>
+<script src="js/jquery-1.4.2.min.js"></script>
+<script>jwplayer.key="9eE+Y8NAuPYaJSF16UNq+JbCHO24+golyV4j/A==";//修改为自己的key</script>
+</head>
+<div id = "container" >Loadingthe player...</div>
+播放地址：<br/>
+<input type="text" id="playUrl" value="rtmp://192.168.1.144:1935/lt/stream_2000" style="width:580px;height:30px;">
+<input type="button" id="playBtn" value="播   放">
+<script type = "text/javascript" >
+	$(document).ready(function(){
+		$('#playBtn').click(function(){
+		jwplayer ( "container" ). setup ({
+		//"file": "rtmp://192.168.1.144:1935/lt/stream_2000.flv",//视频文件路径
+		"file": $('#playUrl').val(),//视频文件路径
+	        //flashplayer : "jwplayer/player.swf" ,
+	        height : 360 ,
+	        width : 640 ,
+	        image : "images/top5cover.png" ,
+	         
+	  
+	    });
+		
+		});
+	
+	
+	
+	});
+
+
+</script>

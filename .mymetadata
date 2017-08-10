@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="Red5lt"
+  id="myeclipse.1497488061536"
+  context-root="/Red5lt"
+  j2ee-spec="5.0"
+  archive="Red5lt.war">
+  <attributes>
+    <attribute name="webrootdir" value="WebRoot" />
+  </attributes>
+</project-module>
+

@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <!--  <script src="js/jquery-1.4.2.min.js"></script>-->
+    <script src="js/jquery-1.10.1.js"></script>
+    <script src="publisher.js"></script>
+    <script type="text/javascript">
+    $(document).ready(function(){
+    	$('#front').click(function(){
+    		$('#previewBtn').click();
+    		$(this).hide();
+    	
+    	});
+    	$('#front').mouseover(function(){
+		  $(this).css("opacity","0.9");
+		});
+    	$('#front').mouseleave(function(){
+		  $(this).css("opacity","1.0");
+		});
+		 
+		
+    ///////////
+
+		var isIE = !-[1,];
+		if(isIE){
+		    try{
+		        var swf1 = new ActiveXObject('ShockwaveFlash.ShockwaveFlash');
+		        //alert('安装了Flash');
+		        $('#checkFlash').hide();
+		    }
+		    catch(e){
+		        //alert('没有安装Flash');
+		        $('#checkFlash').show();
+		    }
+		}
+		else {
+		    try{
+		        var swf2 = navigator.plugins['Shockwave Flash'];
+		        if(swf2 == undefined){
+		            //alert('没有安装Flash');
+		           
+		            $('#checkFlash').show();
+		        }
+		        else {
+		            //alert('安装了Flash');
+		             $('#checkFlash').hide();
+		        }
+		    }
+		    catch(e){
+		        //alert('没有安装Flash');
+		        $('#checkFlash').show();
+		    }
+		}
+
+    });
+   
+    </script>
+     
+    <style type="text/css">
+        .m-input {
+            margin-bottom: 10px;
+        }
+        .u-input-name {
+            display: inline-block;
+            width: 85px;
+        }
+        .u-input {
+            width: 500px;
+            height: 25px;
+            border: none;
+            border-bottom: 1px solid #000;
+            outline: none;
+            color: #000;
+        }
+        .testBtn {
+            width: 150px;
+        }
+        .u-status {
+            margin-left: 10px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <span id="checkFlash" style="font-size:18px">您还没有安装flash播放器,请点击
+    <a  href="http://www.adobe.com/go/getflash" target="_blank">这里</a>安装</span>
+    <div class="m-input">
+        <span class="u-input-name">摄像头：</span>
+        <select class="u-input" id="cameraSelect">
+        </select>
+    </div>
+    <div class="m-input">
+        <span class="u-input-name">麦克风：</span>
+        <select class="u-input" id="microPhoneSelect">
+        </select>
+    </div>
+    <div class="m-input">
+        <span class="u-input-name">清晰度：</span>
+        <select class="u-input" id="qualitySelect" >
+            <option value="0">流畅（480*360@20）</option>
+            <option value="1">标清（640*480@20）</option>
+            <option value="2">高清（960*540@20）</option>
+        </select>
+    </div>
+    <div class="m-input">
+        <span class="u-input-name">推流地址：</span>
+        <input class="u-input" type="text" value="rtmp://192.168.1.144:1935/lt/stream_2000" id="publishUrl">
+    </div>
+    <div class="m-input">
+        <button class="button button-primary button-rounded testBtn" id="previewBtn" onclick="startPreview()">预览</button>
+        <button class="button button-primary button-rounded testBtn" id="publishBtn" onclick="startPublish()">开始直播</button>
+        <button class="button button-primary button-rounded testBtn" id="stopBtn" onclick="stopPublish()">停止直播</button>
+        
+        <span class="u-status"></span>
+    </div>
+    <div  >
+    <div id="my-publisher" ></div>
+    <img id="front" alt="" src="images/front.png" style="position:absolute;left:10px;"></img>
+    </div>
+    
+    
+    <script type="text/javascript">
+        var cameraList,
+            microPhoneList,
+            cameraOptions = '',
+            microPhoneOptions = '';
+        var publishBtn = document.getElementById('publishBtn');
+        var previewBtn = document.getElementById('previewBtn')
+        var testInput = document.getElementsByClassName('u-input');
+        var myPublisher = new nePublisher('my-publisher', {
+                //viewOptions
+                videoWidth: 640,
+                videoHeight: 360,
+                fps: 20,
+                bitrate: 1500
+            }, {
+                //flashOptions
+                previewWindowWidth: 640,
+                previewWindowHeight: 360,
+                wmode: 'transparent',
+                quality: 'high',
+                allowScriptAccess: 'always'
+            }, function() {
+                cameraList = this.getCameraList();
+                microPhoneList = this.getMicroPhoneList();
+                console.log(cameraList, microPhoneList);
+                for (var i = cameraList.length - 1; i >= 0; i--) {
+                    cameraOptions = '<option value="' + i + '">' + cameraList[i] + '</option>' + cameraOptions;
+                }
+                for (var i = microPhoneList.length - 1; i >= 0; i--) {
+                    microPhoneOptions = '<option value="' + i + '">' + microPhoneList[i] + '</option>' + microPhoneOptions;
+                }
+                document.getElementById("cameraSelect").innerHTML = cameraOptions;
+                document.getElementById("microPhoneSelect").innerHTML = microPhoneOptions;
+            }, function(code, desc) {
+                console.log(code, desc);
+                alert(code + '：' + desc);
+            });
+        var qualityList = [
+            {
+                //流畅
+                fps: 20,
+                bitrate: 600,
+                videoWidth:480,
+                videoHeight:360
+            },
+            {
+                //标清
+                fps: 20,
+                bitrate: 800,
+                videoWidth:640,
+                videoHeight:480
+            },
+            {
+                //高清
+                fps: 20,
+                bitrate: 1500,
+                videoWidth:960,
+                videoHeight:540
+            }
+        ];
+        var getCameraIndex = function() {
+            var cameraSelect = document.getElementById("cameraSelect");
+            var cameraIndex = cameraSelect.selectedIndex;
+            return cameraSelect.options[cameraIndex].value;
+        };
+        var getMicroPhoneIndex = function() {
+            var microPhoneSelect = document.getElementById("microPhoneSelect");
+            var microPhoneIndex = microPhoneSelect.selectedIndex;
+            return microPhoneSelect.options[microPhoneIndex].value;
+        };
+        var getQualityOption = function() {
+            var qualitySelect = document.getElementById("qualitySelect");
+            var qualityIndex = qualitySelect.selectedIndex;
+            return qualityList[qualityIndex];
+        };
+        var startPreview = function() {
+            myPublisher.startPreview(getCameraIndex());
+            document.getElementsByClassName('u-status')[0].innerHTML = '预览中';
+        };
+        var startPublish = function() {
+            var publishUrl = document.getElementById("publishUrl").value;
+            startPublishCall();
+            myPublisher.setCamera(getCameraIndex());
+            myPublisher.setMicroPhone(getMicroPhoneIndex());
+            myPublisher.startPublish(publishUrl, getQualityOption(),function(code, desc) {
+                //console.log(code, desc);
+                alert(code + '：' + desc);
+                stopPublishCall();
+            });
+            
+        };
+        var stopPublish = function() {
+            myPublisher.stopPublish();
+            stopPublishCall();
+        };
+        var startPublishCall = function() {
+            console.log('推流开始');
+            document.getElementsByClassName('u-status')[0].innerHTML = '直播中';
+           
+            for (var i = testInput.length - 1; i >= 0; i--) {
+                testInput[i].disabled = true;
+            }
+            previewBtn.disabled = true;
+
+        };
+        var stopPublishCall = function() {
+            console.log('推流结束');
+            document.getElementsByClassName('u-status')[0].innerHTML = '预览中';
+            publishBtn.innerHTML = '开始直播';
+            publishBtn.onclick = startPublish;
+            for (var i = testInput.length - 1; i >= 0; i--) {
+                testInput[i].disabled = false;
+            }
+            previewBtn.disabled = false;
+        };
+        
+        
+        /**
+		 * getCameraSnapshot 获取当前camera的快照，开始预览后方可使用此接口
+		 * @param callback {Function} 必选  回调函数 回调函数将传入的参数是jpg图像编码后的base64字符串
+		 * @param quality  {Number}      必选  设置jpg编码质量  值范围为为0~100
+		 */
+		/* myPublisher.getCameraSnapshot(function(imgBase64Str){
+		    //preview snapshot
+		    document.getElementById("myimg").src = "data:image/jpeg;base64," + imgBase64Str;
+		    //or send to server
+		    // ...
+		}, 50); */
+    </script>
+</body>
+</html>
