@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import lt.red5.convert.ConvertUtils;
 import lt.red5.database.ConnectPoolC3P0;
 
 import org.red5.server.adapter.ApplicationAdapter;
@@ -59,7 +60,7 @@ public class Application  extends ApplicationAdapter {
 				 List<Object> param = new ArrayList<Object>();
 				 param.add(streamName);
 				 param.add(names[1]);
-			    int result= conn.execute("UPDATE KUNG_EDU_CATALOG SET STATUS='1' , TYPE='直播' , ZHIBO_URL=?  WHERE ID=?", param);
+			    int result= conn.execute("UPDATE KUNG_EDU_CATALOG SET STATUS='1' , TYPE='直播' , ZHIBO_URL=?,URL_STATE=1  WHERE ID=?", param);
 			    System.out.println("修改记录数："+result);
 			}
 			else{
@@ -86,8 +87,13 @@ public class Application  extends ApplicationAdapter {
 				ConnectPoolC3P0 conn = ConnectPoolC3P0.getInstance();
 				 List<Object> param = new ArrayList<Object>();
 				 param.add(names[1]);
-				int result= conn.execute("UPDATE KUNG_EDU_CATALOG SET STATUS='0' , TYPE='录播' WHERE ID=?", param);
+				int result= conn.execute("UPDATE KUNG_EDU_CATALOG SET STATUS='0'   WHERE ID=?", param);
 				System.out.println("修改记录数："+result);
+				
+				Thread.sleep(10000);
+				System.out.println("开始转码");
+				ConvertUtils cu = new ConvertUtils();
+				cu.Contvert(streamName, names[1]);
 			}
 			else{
 				System.out.println("直播流名称不正确："+streamName); 
