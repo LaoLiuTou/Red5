@@ -168,7 +168,7 @@ public class ConvertUtils {
             List<String> commend = new java.util.ArrayList<String>();  
             
             //低精度    
-            commend.add(ffmpeg_home);  
+          /* commend.add(ffmpeg_home);  
             commend.add("-i");    
             commend.add(inputFile);    
             
@@ -185,27 +185,50 @@ public class ConvertUtils {
             // 清晰度 -qscale 4 为最好但文件大, -qscale 6就可以了  
             commend.add("-qscale");    
             commend.add("4");    
-            commend.add("-y");    
-               
-            /*commend.add("-f");  //mp4  
-            commend.add("mp4");   
-            commend.add("-acodec");   
-            commend.add("libfaac");   
-            commend.add("-vcodec");   
-            commend.add("libxvid");   
-            commend.add("-qscale");   
-            commend.add("7");   
-            commend.add("-dts_delta_threshold");   
-            commend.add("1");   
-            commend.add("-y");*/   
+            commend.add("-y");   */  
             
-            commend.add(outputFile);    
-            StringBuffer test=new StringBuffer();    
-            for(int i=0;i<commend.size();i++)    
-                test.append(commend.get(i)+" ");    
-            //System.out.println(test);   
-            System.out.println("转换指令："+test);
-            try {    
+            
+            
+            //h264
+            Properties properties = new Properties();
+    		String base = ConvertUtils.class.getResource("/")
+    				.getPath();
+    		try {
+    			properties.load(new FileInputStream(base
+    					+ "path/filepath.properties"));
+        		String os=properties.getProperty("OS").trim() ;
+        		//Linux  
+        		if(os.toLowerCase().equals("Linux".toLowerCase())){
+        			commend.add(ffmpeg_home);  
+                    commend.add("-i");    
+                    commend.add(inputFile);    
+                    //commend.add("-c:v");  //windows  
+                    commend.add("-vcodec");  //Linux  
+                    commend.add("libx264");      
+                    commend.add("-vpre");      
+                    commend.add("fast");    
+                    commend.add("-vcodec");    
+                    commend.add("copy");     
+                    commend.add("-strict");    
+                    commend.add("-2");  
+        		}
+        		else{
+        			commend.add(ffmpeg_home);  
+                    commend.add("-i");    
+                    commend.add(inputFile);    
+                    commend.add("-c:v");  //windows  
+                    commend.add("libx264");      
+                    commend.add("-strict");    
+                    commend.add("-2");  
+        		}
+             
+		        commend.add(outputFile);    
+		        StringBuffer test=new StringBuffer();    
+		        for(int i=0;i<commend.size();i++)    
+		            test.append(commend.get(i)+" ");    
+		        //System.out.println(test);   
+		        System.out.println("转换指令："+test);
+               
                 ProcessBuilder builder = new ProcessBuilder();    
                 builder.command(commend);    
                 //builder.start();    
@@ -249,57 +272,44 @@ public class ConvertUtils {
                // System.out.println("ffmpeg.exe运行完毕！");  
                 System.out.println("转换完成："+outputFile);
                 
-                
-                Properties properties = new Properties();
-	    		String base = ConvertUtils.class.getResource("/")
-	    				.getPath();
-	    		try {
-	    			
-	    			
-	    			
-	    			properties.load(new FileInputStream(base
-	    					+ "path/filepath.properties"));
-	    			  
-		    		String inputFile_home = properties.getProperty("inputFile_home").trim();
-		    		String outfileName=outputFile.replace(inputFile_home, "");
-		    		/*kung_edu_catalog=iKung_edu_catalogService.selectkung_edu_catalogById(id);
-		    		kung_edu_catalog.setC_url(outfileName);
-		    		kung_edu_catalog.setUrl_state(Long.parseLong("2"));
-		    		kung_edu_catalog.setId(Long.parseLong(cuttentId));
-	                iKung_edu_catalogService.updatekung_edu_catalog(kung_edu_catalog);*/
-		    		ConnectPoolC3P0 conn = ConnectPoolC3P0.getInstance();
-					 List<Object> param = new ArrayList<Object>();
-					 param.add(outfileName);
-					 param.add(cuttentId);
-					int result= conn.execute("UPDATE KUNG_EDU_CATALOG SET URL_STATE='2',c_url= ?   WHERE ID=?", param);
-					System.out.println("转换完成");
-					
-					
-	               //是否删除临时文件和源文件
-	                String deleteTemp_flag =properties.getProperty("deleteTemp_flag").trim();
-	                String deleteInput_flag =properties.getProperty("deleteInput_flag").trim();
-	                if(deleteTemp_flag.equals("true")){
-	            	    if(deleteFile(tempFile_home)){
-		    				System.out.println("删除临时文件完成："+tempFile_home);
-		    			}
-		    			else{
-		    				System.out.println("删除临时文件失败："+tempFile_home);
-		    			}
-	                }
-	                if(deleteInput_flag.equals("true")){
-	            	    if(deleteFile(inputFile)){
-		    				System.out.println("删除源文件完成："+inputFile);
-		    			}
-		    			else{
-		    				System.out.println("删除源文件失败："+inputFile);
-		    			}
-		            }
+               
+	    		//更新数据库记录	  
+	    		String inputFile_home = properties.getProperty("inputFile_home").trim();
+	    		String outfileName=outputFile.replace(inputFile_home, "");
+	    		/*kung_edu_catalog=iKung_edu_catalogService.selectkung_edu_catalogById(id);
+	    		kung_edu_catalog.setC_url(outfileName);
+	    		kung_edu_catalog.setUrl_state(Long.parseLong("2"));
+	    		kung_edu_catalog.setId(Long.parseLong(cuttentId));
+                iKung_edu_catalogService.updatekung_edu_catalog(kung_edu_catalog);*/
+	    		ConnectPoolC3P0 conn = ConnectPoolC3P0.getInstance();
+				 List<Object> param = new ArrayList<Object>();
+				 param.add(outfileName);
+				 param.add(cuttentId);
+				int result= conn.execute("UPDATE KUNG_EDU_CATALOG SET URL_STATE='2',c_url= ?   WHERE ID=?", param);
+				System.out.println("转换完成");
+				
+				
+               //是否删除临时文件和源文件
+                String deleteTemp_flag =properties.getProperty("deleteTemp_flag").trim();
+                String deleteInput_flag =properties.getProperty("deleteInput_flag").trim();
+                if(deleteTemp_flag.equals("true")){
+            	    if(deleteFile(tempFile_home)){
+	    				System.out.println("删除临时文件完成："+tempFile_home);
+	    			}
+	    			else{
+	    				System.out.println("删除临时文件失败："+tempFile_home);
+	    			}
+                }
+                if(deleteInput_flag.equals("true")){
+            	    if(deleteFile(inputFile)){
+	    				System.out.println("删除源文件完成："+inputFile);
+	    			}
+	    			else{
+	    				System.out.println("删除源文件失败："+inputFile);
+	    			}
+	            }
 	                
-	    		}
-	    		catch (Exception e) {
-					// TODO: handle exception
-	    			System.out.println("更改状态异常："+e);
-				}
+	    	
                 
                 
                 
