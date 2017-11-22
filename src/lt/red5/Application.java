@@ -1,10 +1,16 @@
 package lt.red5;
 
+ 
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 import lt.red5.convert.ConvertUtils;
 import lt.red5.database.ConnectPoolC3P0;
@@ -18,9 +24,10 @@ import org.red5.server.api.stream.IBroadcastStream;
 import org.red5.server.api.stream.IPlayItem;
 import org.red5.server.api.stream.ISubscriberStream;
 import org.red5.server.stream.ClientBroadcastStream;
-
-
  
+
+
+
 public class Application  extends ApplicationAdapter {
 
 	public Application iapp; 
@@ -67,6 +74,14 @@ public class Application  extends ApplicationAdapter {
 				System.out.println("直播流名称不正确："+streamName); 
 				
 			}
+			
+			 
+			 
+			//推送 hls 直播流
+			new ConvertThread(streamName).start();
+			//sendHls(streamName);
+			
+			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			System.out.println("直播开始异常："+e); 
@@ -74,6 +89,30 @@ public class Application  extends ApplicationAdapter {
 		}
 		
 	}
+	
+	
+	class ConvertThread extends Thread{
+		private String fileName;
+		 
+	    public ConvertThread(String fileName){ 
+	       this.fileName=fileName;
+	        
+	    }
+        @Override
+        public void run() {
+        	//推送 hls 直播流
+        	/*try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}*/
+        	ConvertUtils cu = new ConvertUtils();
+			cu.sendHls(fileName);
+			
+        }
+	}
+	
  
 	@Override
 	public void streamRecordStop(IBroadcastStream stream) {
@@ -154,3 +193,4 @@ public class Application  extends ApplicationAdapter {
 	}*/
 
 }
+

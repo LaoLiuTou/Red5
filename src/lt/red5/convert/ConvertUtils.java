@@ -6,10 +6,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.LineNumberReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties; 
 
+import lt.red5.Application;
 import lt.red5.database.ConnectPoolC3P0;
 
 
@@ -199,18 +201,29 @@ public class ConvertUtils {
         		String os=properties.getProperty("OS").trim() ;
         		//Linux  
         		if(os.toLowerCase().equals("Linux".toLowerCase())){
-        			commend.add(ffmpeg_home);  
+        			/*commend.add(ffmpeg_home);  
                     commend.add("-i");    
                     commend.add(inputFile);    
                     //commend.add("-c:v");  //windows  
                     commend.add("-vcodec");  //Linux  
                     commend.add("libx264");      
-                    commend.add("-vpre");      
-                    commend.add("fast");    
+                    //commend.add("-acodec");    
+                    //commend.add("libfaac");
+                    //commend.add("-b");    
+                    //commend.add("1.5M");    
                     commend.add("-vcodec");    
-                    commend.add("copy");     
+                    commend.add("copy"); 
+                    commend.add("-vpre");      
+                    commend.add("fast");   
                     commend.add("-strict");    
-                    commend.add("-2");  
+                    commend.add("-2"); */ 
+        			commend.add(ffmpeg_home);  
+                    commend.add("-i");    
+                    commend.add(inputFile);    
+                    commend.add("-c:v");  //windows  
+                    commend.add("libx264");      
+                    commend.add("-strict");    
+                    commend.add("-2"); 
         		}
         		else{
         			commend.add(ffmpeg_home);  
@@ -419,12 +432,153 @@ public class ConvertUtils {
         }     
     }    
 	
+    
+    public void sendHls(String name){
+    	
+    	/*try {
+			Thread.sleep(5000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}*/
+    	
+    	 Properties properties = new Properties();
+			String base = Application.class.getResource("/")
+					.getPath();
+			 
+				try {
+					
+				
+					
+					List<String> commend = new java.util.ArrayList<String>();  
+					properties.load(new FileInputStream(base
+							+ "path/filepath.properties"));
+					//String ffmpeg_home = base+"tools/ffmpeg/ffmpeg.exe";//ffmpeg.exe所放的路径  
+					//String nginx_url = properties.getProperty("nginx_url").trim(); 
+					String rtmp_url = properties.getProperty("rtmp_url").trim(); 
+					String inputFile_home = properties.getProperty("inputFile_home").trim(); 
+
+					String os=properties.getProperty("OS").trim() ;
+		    		String ffmpeg_home = base+"tools/ffmpeg/ffmpeg.exe";//ffmpeg.exe所放的路径  
+		    		//String mencoder_home = base+"tools/mencoder/mencoder.exe";//mencoder.exe所放的路径  
+		    		//Linux 环境下更改目录
+		    		if(os.toLowerCase().equals("Linux".toLowerCase())){
+		    			ffmpeg_home=properties.getProperty("ffmpeg_home").trim() ;
+		    			//mencoder_home=properties.getProperty("mencoder_home").trim() ;
+		    		}
+					
+					File file = new File(inputFile_home+name);
+					if (!file.exists())
+					{
+						file.mkdir();
+					}
+					
+					
+					
+					commend.add(ffmpeg_home);  
+					  
+				    /*commend.add("-i");    
+				    commend.add(inputFile_home+"wukong.flv");    
+				    commend.add("-vcodec");   
+	                commend.add("copy");    
+	                commend.add("-f");    
+	                commend.add("flv");   
+				    commend.add(rtmp_url+"stream_555"); */
+				    
+				    
+					/*commend.add("-re");    
+				    commend.add("-i");    
+				    commend.add(rtmp_url+name+" live=1");   
+				    commend.add("-strict");   
+	                commend.add("-2");   
+	                commend.add("-vcodec");   
+	                commend.add("copy");  
+	                 
+	                commend.add("-f");
+	                commend.add("hls");
+	                commend.add(inputFile_home+"test/"+name+".m3u8"); */ 
+				   
+	                commend.add("-v");    
+	                commend.add("verbose");    
+	                 commend.add("-i");    
+	                commend.add(rtmp_url+name+" live=1");   
+	                commend.add("-strict");   
+	                commend.add("-2"); 
+	                if(os.toLowerCase().equals("Linux".toLowerCase())){
+	                	commend.add("-vcodec");    
+		                commend.add("copy");
+	                }
+	                else{
+	                	commend.add("-c:v");    
+		                commend.add("libx264");
+		                commend.add("-c:a");
+		                commend.add("aac");
+		                
+		                commend.add("-crf");
+		                commend.add("20");
+		                commend.add("-profile:v");
+		                commend.add("main");
+	                }
+	                commend.add("-ac");   
+	                commend.add("1");   
+	                commend.add("-maxrate");
+	                commend.add("800k");
+	                commend.add("-bufsize");
+	                commend.add("1835k");
+	                commend.add("-pix_fmt");
+	                commend.add("yuv420p");
+	                commend.add("-flags");
+	                commend.add("-global_header");
+	                commend.add("-hls_time");
+	                commend.add("10");
+	                commend.add("-start_number");
+	                commend.add("1");
+	                commend.add("-f");
+	                commend.add("segment");
+	                commend.add("-segment_list");
+	                commend.add(inputFile_home+name+"/"+name+".m3u8");
+	                commend.add("-segment_list_flags");
+	                commend.add("+live");
+	                commend.add("-segment_time");
+	                commend.add("10");
+	                commend.add(inputFile_home+name+"/"+name+"%03d.ts"); 
+	                
+				  
+					StringBuffer test=new StringBuffer();    
+					for(int i=0;i<commend.size();i++)    
+					    test.append(commend.get(i)+" ");    
+					//System.out.println(test);   
+					System.out.println("转换指令："+test);
+					ProcessBuilder builder = new ProcessBuilder();    
+					builder.command(commend);    
+					//builder.start();    
+					//Process process = Runtime.getRuntime().exec(test.toString());//执行命令
+					Process p=builder.start();
+				  
+		           /*InputStreamReader ir = new InputStreamReader(p.getInputStream());
+		           LineNumberReader input = new LineNumberReader(ir);
+		           String line;
+		           while ((line = input.readLine()) != null) {//输出结果
+		        	   System.out.println(line);
+		           }
+		       	  
+					p.waitFor(); */
+					
+				
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}    
+	}
+    
 	/**
 	 * @param args
 	 */
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-
+		ConvertUtils cu = new ConvertUtils();
+		//cu.Contvert("stream_4", "4");
+		cu.sendHls("stream_555");
 	}
 
 }
