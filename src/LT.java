@@ -38,7 +38,7 @@ public class LT {
 							+ "path/filepath.properties"));
 					String ffmpeg_home = base+"tools/ffmpeg/ffmpeg.exe";//ffmpeg.exe所放的路径  
 					//String nginx_url = properties.getProperty("nginx_url").trim(); 
-					//String rtmp_url = properties.getProperty("rtmp_url").trim(); 
+					String rtmp_url = properties.getProperty("rtmp_url").trim(); 
 					String inputFile_home = properties.getProperty("inputFile_home").trim(); 
 					 
 					//ffmpeg -i rtmp://server/live/originalStream -c:a copy -c:v libx264 -vpre slow -f flv rtmp://server/live/h264Stream  
@@ -54,9 +54,9 @@ public class LT {
 	                commend.add("flv");   
 				    commend.add(rtmp_url+"stream_555"); */
 				        
- 				    /*commend.add("-i");    
-				    commend.add(inputFile_home+"stream_2000"); 
- 				  // commend.add(rtmp_url+"stream_2000 live=1");   
+ 				   /*commend.add("-i");    
+				   // commend.add(inputFile_home+"stream_20001"); 
+ 				   commend.add(rtmp_url+"stream_20001 live=1");   
 				    
 				    commend.add("-strict");   
 	                commend.add("-2");   
@@ -64,26 +64,39 @@ public class LT {
 	                commend.add("copy"); 
 	                commend.add("-f");
 	                commend.add("hls");
-	                commend.add(inputFile_home+"test/"+"stream_2000"+".m3u8"); */
+	                commend.add(inputFile_home+"test/"+"stream_2000"+".m3u8");*/
+					
+					String name="stream_2000";
+					commend.add("-re");    
+	                commend.add("-i");    
+	                commend.add(rtmp_url+name+" live=1");   
+	                commend.add("-vcodec");    
+	                commend.add("copy");
+	                commend.add("-map");
+	                commend.add("0");
+	                commend.add("-f");
+	                commend.add("hls");
+	                commend.add("-hls_list_size");
+	                commend.add("6");
+	                commend.add("-hls_wrap");
+	                commend.add("10");
+	                commend.add("-hls_time");
+	                commend.add("10");
+	                commend.add(inputFile_home+name+"/"+name+".m3u8");
+					
+					 
 					
 					
-					
-					commend.add("-v");    
+					/*commend.add("-v");    
 	                commend.add("verbose");    
 	                 commend.add("-i");    
-	                 commend.add(inputFile_home+"wukong.flv");       
+	                commend.add(rtmp_url+name+" live=1");   
 	                commend.add("-strict");   
-	                commend.add("-2");   
-	                commend.add("-c:v");    
-	                commend.add("libx264");
-	                commend.add("-c:a");
-	                commend.add("aac");
+	                commend.add("-2"); 
+	                	commend.add("-vcodec");    
+		                commend.add("copy");
 	                commend.add("-ac");   
 	                commend.add("1");   
-	                commend.add("-crf");
-	                commend.add("20");
-	                commend.add("-profile:v");
-	                commend.add("main");
 	                commend.add("-maxrate");
 	                commend.add("800k");
 	                commend.add("-bufsize");
@@ -93,20 +106,20 @@ public class LT {
 	                commend.add("-flags");
 	                commend.add("-global_header");
 	                commend.add("-hls_time");
-	                commend.add("10");
+	                commend.add("10"); 
 	                commend.add("-start_number");
 	                commend.add("1");
 	                commend.add("-f");
 	                commend.add("segment");
 	                commend.add("-segment_list");
-	                commend.add(inputFile_home+"test/"+"stream_2000"+".m3u8");
+	                commend.add(inputFile_home+name+"/"+name+".m3u8");
 	                commend.add("-segment_list_flags");
 	                commend.add("+live");
 	                commend.add("-segment_time");
 	                commend.add("10");
-	                commend.add(inputFile_home+"test/"+"stream_2000"+"%03d.ts"); 
+	                commend.add(inputFile_home+name+"/"+name+"%03d.ts"); */
  				   
- 				   
+	                
 	                
 				  
 					StringBuffer test=new StringBuffer();    

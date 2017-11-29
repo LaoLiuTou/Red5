@@ -101,12 +101,12 @@ public class Application  extends ApplicationAdapter {
         @Override
         public void run() {
         	//推送 hls 直播流
-        	/*try {
+        	try {
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}*/
+			}
         	ConvertUtils cu = new ConvertUtils();
 			cu.sendHls(fileName);
 			

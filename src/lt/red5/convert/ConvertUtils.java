@@ -486,7 +486,7 @@ public class ConvertUtils {
 				    commend.add(rtmp_url+"stream_555"); */
 				    
 				    
-					/*commend.add("-re");    
+					 /*commend.add("-re");    
 				    commend.add("-i");    
 				    commend.add(rtmp_url+name+" live=1");   
 				    commend.add("-strict");   
@@ -496,16 +496,18 @@ public class ConvertUtils {
 	                 
 	                commend.add("-f");
 	                commend.add("hls");
-	                commend.add(inputFile_home+"test/"+name+".m3u8"); */ 
+	                commend.add(inputFile_home+name+"/"+name+".m3u8");  */
 				   
 	                commend.add("-v");    
 	                commend.add("verbose");    
 	                 commend.add("-i");    
-	                commend.add(rtmp_url+name+" live=1");   
+	                commend.add(rtmp_url+name);   
 	                commend.add("-strict");   
 	                commend.add("-2"); 
 	                if(os.toLowerCase().equals("Linux".toLowerCase())){
 	                	commend.add("-vcodec");    
+		                commend.add("copy");
+		                commend.add("-acodec");    
 		                commend.add("copy");
 	                }
 	                else{
@@ -514,10 +516,10 @@ public class ConvertUtils {
 		                commend.add("-c:a");
 		                commend.add("aac");
 		                
-		                commend.add("-crf");
-		                commend.add("20");
-		                commend.add("-profile:v");
-		                commend.add("main");
+		                //commend.add("-crf");
+		                //commend.add("20");
+		                //commend.add("-profile:v");
+		                //commend.add("main");
 	                }
 	                commend.add("-ac");   
 	                commend.add("1");   
@@ -531,6 +533,7 @@ public class ConvertUtils {
 	                commend.add("-global_header");
 	                commend.add("-hls_time");
 	                commend.add("10");
+	                 
 	                commend.add("-start_number");
 	                commend.add("1");
 	                commend.add("-f");
@@ -539,6 +542,9 @@ public class ConvertUtils {
 	                commend.add(inputFile_home+name+"/"+name+".m3u8");
 	                commend.add("-segment_list_flags");
 	                commend.add("+live");
+	                commend.add("-segment_wrap");
+	                commend.add("5");
+	                
 	                commend.add("-segment_time");
 	                commend.add("10");
 	                commend.add(inputFile_home+name+"/"+name+"%03d.ts"); 
@@ -549,20 +555,41 @@ public class ConvertUtils {
 					    test.append(commend.get(i)+" ");    
 					//System.out.println(test);   
 					System.out.println("转换指令："+test);
-					ProcessBuilder builder = new ProcessBuilder();    
-					builder.command(commend);    
+					/*ProcessBuilder builder = new ProcessBuilder();    
+					builder.command(commend); 
+					
+				  
+		            builder.redirectErrorStream(true);  
+		            builder.start();  */
+				     
+		            
+		            Runtime rt = Runtime.getRuntime();  
+		            Process proc = rt.exec(test.toString());  
+		            InputStream stderr = proc.getErrorStream();  
+		            InputStreamReader isr = new InputStreamReader(stderr);  
+		            BufferedReader br = new BufferedReader(isr);  
+		            String line = null;  
+		            System.out.println("<ERROR>");  
+		            while ((line = br.readLine()) != null){  
+		                //System.out.println(line);  
+		            }  
+		            System.out.println("</ERROR>");  
+		            int exitVal = proc.waitFor();  
+		            System.out.println("Process exitValue: " + exitVal);
+		            
 					//builder.start();    
 					//Process process = Runtime.getRuntime().exec(test.toString());//执行命令
-					Process p=builder.start();
+					//Process p=builder.start();
 				  
 		           /*InputStreamReader ir = new InputStreamReader(p.getInputStream());
 		           LineNumberReader input = new LineNumberReader(ir);
 		           String line;
 		           while ((line = input.readLine()) != null) {//输出结果
 		        	   System.out.println(line);
-		           }
+		           }*/
 		       	  
-					p.waitFor(); */
+					//p.waitFor();  
+					//System.out.println("XXXXXXXXXXXXXXXXXXXXX");
 					
 				
 				} catch (Exception e) {
